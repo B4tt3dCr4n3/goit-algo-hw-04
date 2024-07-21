@@ -20,6 +20,19 @@ import pandas as pd
 def generate_random_array(size):
     return [random.randint(0, size) for _ in range(size)]
 
+# Функція для генерації майже відсортованих масивів
+def generate_almost_sorted_array(size):
+    arr = list(range(size))
+    for i in range(size // 10):
+        j = random.randint(0, size - 1)
+        k = random.randint(0, size - 1)
+        arr[j], arr[k] = arr[k], arr[j]
+    return arr
+
+# Функція для генерації зворотно відсортованих масивів
+def generate_reverse_sorted_array(size):
+    return list(range(size, 0, -1))
+
 # Реалізація сортування злиттям
 def merge_sort(arr):
     if len(arr) > 1:
@@ -68,21 +81,26 @@ def measure_time(func, data):
     return timeit.default_timer() - start_time
 
 # Випробування алгоритмів
-array_sizes = [1000, 2000, 5000, 10000, 20000]
+array_sizes = [1000, 2000, 5000, 10000]
 results = []
 
 for size in array_sizes:
-    data = generate_random_array(size)  # Генерація випадкового масиву
-    merge_sort_time = measure_time(merge_sort, data.copy())  # Час сортування злиттям
-    insertion_sort_time = measure_time(insertion_sort, data.copy())  # Час сортування вставками
-    timsort_time = measure_time(lambda arr: sorted(arr), data.copy())  # Час Timsort
-    
-    results.append({
-        "Розмір": size,
-        "Сортування злиттям": merge_sort_time,
-        "Сортування вставками": insertion_sort_time,
-        "Timsort": timsort_time
-    })
+    random_data = generate_random_array(size)  # Випадковий масив
+    almost_sorted_data = generate_almost_sorted_array(size)  # Майже відсортований масив
+    reverse_sorted_data = generate_reverse_sorted_array(size)  # Зворотно відсортований масив
+
+    for data, label in [(random_data, 'Випадковий'), (almost_sorted_data, 'Майже відсортований'), (reverse_sorted_data, 'Зворотно відсортований')]:
+        merge_sort_time = measure_time(merge_sort, data.copy())  # Час сортування злиттям
+        insertion_sort_time = measure_time(insertion_sort, data.copy())  # Час сортування вставками
+        timsort_time = measure_time(lambda arr: sorted(arr), data.copy())  # Час Timsort
+
+        results.append({
+            "Розмір": size,
+            "Тип масиву": label,
+            "Сортування злиттям": merge_sort_time,
+            "Сортування вставками": insertion_sort_time,
+            "Timsort": timsort_time
+        })
 
 df = pd.DataFrame(results)
 print(df)
